@@ -12,7 +12,7 @@ const roboto = Roboto({
 const sourceCodePro = Source_Code_Pro({
   variable: "--font-source-code",
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {

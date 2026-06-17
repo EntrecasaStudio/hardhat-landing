@@ -12,6 +12,18 @@
   --color-yellow-9: #ccb200;
   --color-earthy-1: #fffeeb;
 
+  /* Violet — generated scale anchored on Figma refs (1 #EEEDFF, 5 #5E21FF, 8 #4217B2) */
+  --color-violet-1: #eeedff;
+  --color-violet-2: #c2baff;
+  --color-violet-3: #9b87ff;
+  --color-violet-4: #7a54ff;
+  --color-violet-5: #5e21ff;
+  --color-violet-6: #4d0ef5;
+  --color-violet-7: #4712d4;
+  --color-violet-8: #4217b2;
+  --color-violet-9: #3c1a92;
+  --color-violet-10: #341b74;
+
   /* Neutrals */
   --color-gray-1: #fbfbfb;
   --color-gray-2: #e5e6e7;
@@ -36,6 +48,7 @@
   --nav-pill: #e5e6e7;
   --banner-bg: #16181d;
   --banner-fg: #ffffff;
+  --hero-panel: #16181d;
 }
 
 .dark {
@@ -47,6 +60,7 @@
   --nav-pill: #333538;
   --banner-bg: #040405;
   --banner-fg: #ffffff;
+  --hero-panel: #15191f;
 }
 
 html {
@@ -56,4 +70,19 @@ html {
 body {
   background: var(--bg);
   color: var(--fg);
+}
+
+/* Theme toggle crossfade (View Transitions API). Both snapshots share the
+   same spot, so the old theme fades out while the new one fades in. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.35s;
+  animation-timing-function: ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
 }

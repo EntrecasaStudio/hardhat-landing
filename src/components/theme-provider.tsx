@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { flushSync } from "react-dom";
 
 type Theme = "light" | "dark";
 
@@ -8,6 +9,11 @@ const ThemeContext = createContext<{
   theme: Theme;
   toggle: () => void;
 }>({ theme: "light", toggle: () => {} });
+
+function applyTheme(next: Theme) {
+  document.documentElement.classList.toggle("dark", next === "dark");
+  localStorage.setItem("theme", next);
+}
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("light");
@@ -17,18 +23,27 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const initial =
       stored ??
       (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    applyTheme(initial);
     setTheme(initial);
   }, []);
 
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-    localStorage.setItem("theme", theme);
+  const toggle = useCallback(() => {
+    const next: Theme = theme === "dark" ? "light" : "dark";
+    if (typeof document.startViewTransition !== "function") {
+      applyTheme(next);
+      setTheme(next);
+      return;
+    }
+    document.startViewTransition(() => {
+      flushSync(() => {
+        applyTheme(next);
+        setTheme(next);
+      });
+    });
   }, [theme]);
 
   return (
-    <ThemeContext.Provider
-      value={{ theme, toggle: () => setTheme((t) => (t === "dark" ? "light" : "dark")) }}
-    >
+    <ThemeContext.Provider value={{ theme, toggle }}>
       {children}
     </ThemeContext.Provider>
   );
