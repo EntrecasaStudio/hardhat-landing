@@ -3,7 +3,7 @@
 import { asset } from "@/lib/asset";
 import { useTheme } from "./theme-provider";
 
-const NAV = ["home", "tools", "plugins", "documentation", "tutorial"];
+const NAV = ["documentation", "plugins", "hardhat 2"];
 
 export function SiteHeader() {
   return (
@@ -17,11 +17,11 @@ export function SiteHeader() {
 function BannerTop() {
   return (
     <div
-      className="flex h-10 items-center justify-center gap-6 font-mono text-[13px] tracking-wide"
+      className="flex h-10 items-center justify-center gap-3 font-mono text-[8px] tracking-wide md:gap-6 md:text-[13px]"
       style={{ background: "var(--banner-bg)", color: "var(--banner-fg)" }}
     >
       <span className="text-yellow-4">{"<<<<<"}</span>
-      <span>join the Hardhat team! Nomic Labs is hiring</span>
+      <span>Hardhat 3 is now production ready. Migrate now</span>
       <span className="text-yellow-4">{">>>>>"}</span>
     </div>
   );
@@ -30,40 +30,30 @@ function BannerTop() {
 function Nav() {
   return (
     <div
-      className="h-[90px] backdrop-blur"
+      className="h-[80px] backdrop-blur xl:h-[90px]"
       style={{ background: "color-mix(in srgb, var(--bg) 85%, transparent)" }}
     >
-      <div className="mx-auto flex h-full max-w-[1920px] items-center justify-between px-8">
+      <div className="mx-auto flex h-full max-w-[1920px] items-center justify-between px-4 md:px-8">
         <a href="#" aria-label="Hardhat" className="flex items-center">
-          <img src={asset("/hardhat-logotype.svg")} alt="Hardhat" className="h-[35px] w-auto select-none dark:hidden" draggable={false} />
-          <img src={asset("/hardhat-logotype-dark.svg")} alt="Hardhat" className="hidden h-[35px] w-auto select-none dark:block" draggable={false} />
+          <img src={asset("/hardhat-logotype.svg")} alt="Hardhat" className="h-[27.665px] w-auto select-none dark:hidden md:h-[35px]" draggable={false} />
+          <img src={asset("/hardhat-logotype-dark.svg")} alt="Hardhat" className="hidden h-[27.665px] w-auto select-none dark:block md:h-[35px]" draggable={false} />
         </a>
 
         {/* Menu Items — Figma spacing: sections 32 · 64 to social · social 24 ·
             40 + 32 (theme pl) to the theme selector. */}
-        <nav className="hidden items-center gap-10 lg:flex">
+        <nav className="hidden items-center gap-10 xl:flex">
           <div className="flex items-center gap-16">
             {/* Sections */}
             <div className="flex items-center gap-8 font-mono text-base font-medium tracking-[0.05em]">
-              {NAV.map((item) =>
-                item === "home" ? (
-                  <a
-                    key={item}
-                    href="#"
-                    className="rounded-[3px] bg-[#6c6f74] px-2 py-[1.5px] text-[#fbfbfb] dark:bg-[#b0b2b5] dark:text-[#16181d]"
-                  >
-                    {item}
-                  </a>
-                ) : (
-                  <a
-                    key={item}
-                    href="#"
-                    className="px-2 py-[1.5px] text-[#4a4d54] transition-colors hover:text-[var(--fg)] dark:text-[#b0b2b5]"
-                  >
-                    {item}
-                  </a>
-                )
-              )}
+              {NAV.map((item) => (
+                <a
+                  key={item}
+                  href="#"
+                  className="px-2 py-[1.5px] text-[#4a4d54] transition-colors hover:text-[var(--fg)] dark:text-[#b0b2b5]"
+                >
+                  {item}
+                </a>
+              ))}
             </div>
 
             {/* Social */}
@@ -83,12 +73,9 @@ function Nav() {
           <ThemeToggle className="pl-8" />
         </nav>
 
-        {/* Mobile: theme toggle + menu */}
-        <div className="flex items-center gap-4 lg:hidden">
+        {/* Mobile / tablet (<1280): theme toggle only (no hamburger, no menu). */}
+        <div className="flex items-center xl:hidden">
           <ThemeToggle />
-          <button aria-label="Menu" className="text-[#4a4d54] transition-colors hover:text-[var(--fg)]">
-            <MenuIcon />
-          </button>
         </div>
       </div>
     </div>
@@ -101,19 +88,10 @@ function ThemeToggle({ className = "" }: { className?: string }) {
     <button
       onClick={toggle}
       aria-label="Toggle theme"
-      className={`flex items-center gap-2 text-[#6c6f74] transition-colors hover:text-[var(--fg)] dark:text-[#fbfbfb] ${className}`}
+      className={`flex items-center text-[#6c6f74] transition-colors hover:text-[var(--fg)] dark:text-[#fbfbfb] ${className}`}
     >
-      <span className="font-mono text-[18px] tracking-[0.05em]">A</span>
       {theme === "dark" ? <MoonIcon /> : <SunIcon />}
     </button>
-  );
-}
-
-function MenuIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-      <path d="M3 6h18M3 12h18M3 18h18" strokeLinecap="round" />
-    </svg>
   );
 }
 
@@ -156,7 +134,7 @@ function DiscordIcon() {
 /* Theme toggle marks — exported from Figma (30×30). */
 function SunIcon() {
   return (
-    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden>
+    <svg className="size-[27px] xl:size-[30px]" viewBox="0 0 30 30" fill="none" aria-hidden>
       <path
         d="M15 6C16.78 6 18.5201 6.52784 20.0001 7.51677C21.4802 8.50571 22.6337 9.91131 23.3149 11.5558C23.9961 13.2004 24.1743 15.01 23.8271 16.7558C23.4798 18.5016 22.6226 20.1053 21.364 21.364C20.1053 22.6226 18.5016 23.4798 16.7558 23.8271C15.01 24.1743 13.2004 23.9961 11.5558 23.3149C9.91131 22.6337 8.50571 21.4802 7.51677 20.0001C6.52784 18.5201 6 16.78 6 15C6.00283 12.6139 6.95195 10.3264 8.63917 8.63917C10.3264 6.95195 12.6139 6.00283 15 6Z"
         fill="currentColor"
@@ -176,7 +154,7 @@ function SunIcon() {
 
 function MoonIcon() {
   return (
-    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden>
+    <svg className="size-[27px] xl:size-[30px]" viewBox="0 0 30 30" fill="none" aria-hidden>
       <path
         d="M16.0361 27.6013C8.51612 27.6013 2.39844 21.4847 2.39844 13.9637C2.39844 9.19331 4.81298 4.88572 8.79393 2.4043C8.21923 3.99724 7.92631 5.66414 7.92631 7.38964C7.92631 15.4885 14.5143 22.0764 22.6131 22.0764C24.3344 22.0764 26.0055 21.7877 27.5984 21.2088C25.1169 25.1872 20.8094 27.6043 16.0391 27.6043L16.0361 27.6013Z"
         fill="currentColor"

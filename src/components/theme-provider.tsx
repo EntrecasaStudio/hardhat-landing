@@ -8,7 +8,8 @@ type Theme = "light" | "dark";
 const ThemeContext = createContext<{
   theme: Theme;
   toggle: () => void;
-}>({ theme: "light", toggle: () => {} });
+  set: (next: Theme) => void;
+}>({ theme: "light", toggle: () => {}, set: () => {} });
 
 function applyTheme(next: Theme) {
   document.documentElement.classList.toggle("dark", next === "dark");
@@ -42,8 +43,15 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     });
   }, [theme]);
 
+  // Set a specific theme (used by the /present sequence). Instant — no crossfade
+  // — so it doesn't overlap with the slot option swapping.
+  const set = useCallback((next: Theme) => {
+    applyTheme(next);
+    setTheme(next);
+  }, []);
+
   return (
-    <ThemeContext.Provider value={{ theme, toggle }}>
+    <ThemeContext.Provider value={{ theme, toggle, set }}>
       {children}
     </ThemeContext.Provider>
   );

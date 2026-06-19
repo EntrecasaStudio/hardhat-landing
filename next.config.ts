@@ -13,6 +13,8 @@ const nextConfig: NextConfig = {
   trailingSlash: true,
   images: { unoptimized: true },
   env: { NEXT_PUBLIC_BASE_PATH: basePath },
+  // Hide the floating dev "N" badge so it doesn't clutter the /review surface.
+  devIndicators: false,
 };
 
 export default nextConfig;
