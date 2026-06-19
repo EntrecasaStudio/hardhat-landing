@@ -93,6 +93,28 @@ export function OptionPager() {
     swipeStart.current = null;
   };
 
+  // Edge tap zones (below): shown only on touch / narrow surfaces, where the
+  // arrow keys are unavailable and the lone swipe is finicky (it fights the
+  // browser's left-edge back gesture). Resolved live so it tracks orientation.
+  const [touchNav, setTouchNav] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(pointer: coarse), (max-width: 1023px)");
+    const update = () => setTouchNav(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  // Step + flash the toast (used by the edge taps; the pager is collapsed here
+  // so the toast is the only on-screen confirmation of the landing variant).
+  const changeBy = useCallback(
+    (d: number) => {
+      nav(idxRef.current + d);
+      flashToast();
+    },
+    [nav, flashToast],
+  );
+
   const option = RELEASE_OPTIONS[index];
 
   return (
@@ -122,6 +144,32 @@ export function OptionPager() {
           Op {index + 1} / {COUNT}
         </span>
       </div>
+
+      {/* Edge tap zones: 100px strips on each side that step prev/next when the
+          pager is collapsed on touch/narrow screens. Sit above the background
+          art (z-5) but below the centred copy/CTA/release (z-10), the header and
+          the pager (z-50), so they never swallow a real control. A faint chevron
+          hints the target; `touch-action: pan-y` keeps vertical scroll. */}
+      {!open && touchNav && (
+        <>
+          <button
+            type="button"
+            aria-label={`Previous option (${option.label})`}
+            onClick={() => changeBy(-1)}
+            className="fixed inset-y-0 left-0 z-[5] flex w-[100px] items-center justify-start pl-2 font-mono text-3xl leading-none text-black/15 transition-colors [touch-action:pan-y] active:text-black/35 dark:text-white/20 dark:active:text-white/40"
+          >
+            <span aria-hidden>‹</span>
+          </button>
+          <button
+            type="button"
+            aria-label={`Next option (${option.label})`}
+            onClick={() => changeBy(1)}
+            className="fixed inset-y-0 right-0 z-[5] flex w-[100px] items-center justify-end pr-2 font-mono text-3xl leading-none text-black/15 transition-colors [touch-action:pan-y] active:text-black/35 dark:text-white/20 dark:active:text-white/40"
+          >
+            <span aria-hidden>›</span>
+          </button>
+        </>
+      )}
 
       {/* Review pager: a centred pill that collapses to a half-circle tab docked
           at the right edge. CSS-only crossfade (transform/opacity, 250ms). */}
