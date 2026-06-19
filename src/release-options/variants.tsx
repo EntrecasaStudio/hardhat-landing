@@ -7,9 +7,12 @@ import type { SlotTone } from "./types";
 
 /* ── Shared per-break sizing ladder (single source of truth, from Option 1) ──
    breakpoints: base=360 · md=768 · xl=1280 · min-[1700px]=1700 */
-const MONO = "font-mono leading-[1.5] tracking-[0.05em]";
-const LINK_BASE = `${MONO} shrink-0 whitespace-nowrap font-bold`;
-const NOTE_BASE = `${MONO} font-medium`;
+const MONO = "font-mono tracking-[0.05em]";
+// Link is a single line with no descenders → leading-none trims the extra
+// line-box height (mirrors Figma's text-box-trim) so it doesn't push the note
+// away. Note keeps leading-[1.5] (it can have descenders / wraps in op2).
+const LINK_BASE = `${MONO} shrink-0 whitespace-nowrap font-bold leading-none`;
+const NOTE_BASE = `${MONO} font-medium leading-[1.5]`;
 
 // Link font-size ladders (by 1700 size): 13@1700 and 16@1700 (Classic). All steps
 // use arbitrary min-[] variants so Tailwind orders them by value (mixing named
@@ -22,8 +25,10 @@ const KICKER_SIZE = "text-[7px] min-[768px]:text-[8px] min-[1280px]:text-[8px] m
 // Inter-element gap ladder (4/4/8/16).
 const GAP = "gap-1 min-[1280px]:gap-2 min-[1700px]:gap-4";
 
-// Single-line truncation behaviour (left while overflowing, centred once it fits).
-const NOTE_TRUNC = "w-full min-w-0 truncate text-left min-[1280px]:text-center";
+// Single-line behaviour: the note shrinks to its content (capped at max-width)
+// so the parent's items-center/justify-center keeps it centred; text-left only
+// governs the ellipsis side when it does overflow (clean left-anchored cut).
+const NOTE_TRUNC = "min-w-0 max-w-full truncate text-left";
 // Note max-width ladders by 1700 width (≈0.55× @768, 0.65× @1280).
 const NW_724 = "min-[768px]:max-w-[400px] min-[1280px]:max-w-[472px] min-[1700px]:max-w-[724px]";
 const NW_508 = "min-[768px]:max-w-[280px] min-[1280px]:max-w-[330px] min-[1700px]:max-w-[508px]";

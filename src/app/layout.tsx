@@ -15,10 +15,30 @@ const sourceCodePro = Source_Code_Pro({
   weight: ["300", "400", "500", "600", "700"],
 });
 
+const TITLE = "Hardhat | Ethereum development environment for professionals";
+const DESCRIPTION =
+  "Hardhat is a development environment to compile, deploy, test, and debug your Ethereum software.";
+// Absolute, basePath-aware URLs so link-preview scrapers resolve the OG image
+// on the deployed GitHub Pages site (static export bakes these into the HTML).
+const SITE = `https://entrecasastudio.github.io${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}`;
+const OG_IMAGE = `${SITE}/og.png`;
+
 export const metadata: Metadata = {
-  title: "Hardhat | Ethereum development environment for professionals",
-  description:
-    "Hardhat is a development environment to compile, deploy, test, and debug your Ethereum software.",
+  metadataBase: new URL(`${SITE}/`),
+  title: TITLE,
+  description: DESCRIPTION,
+  openGraph: {
+    type: "website",
+    title: TITLE,
+    description: DESCRIPTION,
+    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "Hardhat" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+    images: [OG_IMAGE],
+  },
 };
 
 export default function RootLayout({
