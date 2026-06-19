@@ -48,7 +48,7 @@ export function Hero({ option = RELEASE_OPTIONS[0] }: { option?: ReleaseOption }
         </div>
         {/* Release note sits BELOW the mascots (per the 360 frame), never over them,
             with 40px of breathing room beneath it. */}
-        <div className="relative z-10 mx-auto mt-5 w-full max-w-[528px] px-6 pb-10">
+        <div className="relative z-10 mx-auto mt-5 w-full max-w-[408px] px-6 pb-10">
           <Slot copy="text-[#181a1f] dark:text-[#e5e6e7]" note="text-[#4a4d54] dark:text-[#b0b2b5]" />
         </div>
       </div>

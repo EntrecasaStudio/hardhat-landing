@@ -136,11 +136,12 @@ export function VioletPillRelease({ note }: SlotTone) {
   );
 }
 
-/** 6 — Light pill: same chip, neutral underlined link inline-first, truncated note. */
+/** 6 — Light pill: identical to Op5 (Violet pill) but the link takes the copy
+    tone (#181a1f light / #e5e6e7 dark) instead of violet; underline from-font. */
 export function LightPillRelease({ copy, note }: SlotTone) {
   return (
-    <div className={`flex items-center justify-center ${GAP} ${CHIP}`}>
-      <Link size={LINK_13} tone={copy} />
+    <div className={`flex items-center justify-center ${GAP_INLINE} ${CHIP}`}>
+      <Link size={NOTE_SIZE} dec={DEC_UNDERLINE} tone={copy} />
       <Note note={note} w={NW_508} />
     </div>
   );
