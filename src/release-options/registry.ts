@@ -15,9 +15,9 @@ import {
  *  `/review`. */
 export const RELEASE_OPTIONS: ReleaseOption[] = [
   { id: "classic", label: "Classic", Component: ClassicRelease },
-  { id: "inline-note", label: "Inline note", Component: InlineNoteRelease },
   { id: "violet-link", label: "Violet link", Component: VioletLinkRelease },
   { id: "label", label: "Label + row", Component: LabelRelease },
+  { id: "inline-note", label: "Inline note", Component: InlineNoteRelease },
   { id: "violet-pill", label: "Violet pill", Component: VioletPillRelease },
   { id: "light-pill", label: "Light pill", Component: LightPillRelease },
   { id: "inline-row", label: "Inline row", Component: InlineRowRelease },

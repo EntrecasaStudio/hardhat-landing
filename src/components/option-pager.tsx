@@ -72,7 +72,7 @@ export function OptionPager() {
           <PagerButton label={`Previous option (${option.label})`} onClick={() => nav(idxRef.current - 1)} disabled={!open}>
             ‹
           </PagerButton>
-          <span className="min-w-[72px] px-1 text-center tabular-nums tracking-[0.05em]" aria-live="polite">
+          <span className="whitespace-nowrap px-1 text-center tabular-nums tracking-[0.05em]" aria-live="polite">
             Op {index + 1} / {COUNT}
           </span>
           <PagerButton label={`Next option (${option.label})`} onClick={() => nav(idxRef.current + 1)} disabled={!open}>

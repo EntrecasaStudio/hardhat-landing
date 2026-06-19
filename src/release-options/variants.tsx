@@ -21,7 +21,6 @@ const LINK_13 = "text-[10px] min-[768px]:text-[12px] min-[1280px]:text-[13px] mi
 const LINK_16 = "text-[10px] min-[768px]:text-[12px] min-[1280px]:text-[13px] min-[1700px]:text-[16px]";
 // Note / kicker font-size ladders.
 const NOTE_SIZE = "text-[8px] min-[768px]:text-[10px] min-[1280px]:text-[10px] min-[1700px]:text-[13px]";
-const KICKER_SIZE = "text-[7px] min-[768px]:text-[8px] min-[1280px]:text-[8px] min-[1700px]:text-[10px]";
 // Inter-element gap ladder (4/4/8/16).
 const GAP = "gap-1 min-[1280px]:gap-2 min-[1700px]:gap-4";
 
@@ -33,10 +32,13 @@ const NOTE_TRUNC = "min-w-0 max-w-full truncate text-left";
 const NW_724 = "min-[768px]:max-w-[400px] min-[1280px]:max-w-[472px] min-[1700px]:max-w-[724px]";
 const NW_508 = "min-[768px]:max-w-[280px] min-[1280px]:max-w-[330px] min-[1700px]:max-w-[508px]";
 
-// Link decoration + accent colour.
-const DEC_UNDERLINE = "underline decoration-from-font";
-const DEC_DOTTED = "underline decoration-dotted decoration-violet-5";
-const VIOLET = "text-violet-5 dark:text-violet-4";
+// Link decoration + accent colour. All underlines sit 25% (of the font size)
+// below the text and skip ink (break around glyph descenders).
+const UL = "underline-offset-[25%] [text-decoration-skip-ink:auto]";
+const DEC_UNDERLINE = `underline decoration-from-font ${UL}`;
+const DEC_DOTTED = `underline decoration-dotted decoration-violet-5 ${UL}`;
+// Accent violet link (exact Figma): #5E21FF light, #7A5EFF dark.
+const VIOLET = "text-[#5e21ff] dark:text-[#7a5eff]";
 
 // Chip (pill) — theme-correct: violet-1 tint in light, #20232a in dark (NOT
 // violet). Padding/radius scaled per break (px-8 py-4 rounded-32 @1700).
@@ -52,10 +54,11 @@ function Link({ size = LINK_13, dec = DEC_UNDERLINE, tone }: { size?: string; de
   );
 }
 
-/** Muted, single-line truncated note. `w` overrides the 1700 max-width ladder. */
-function Note({ note, w = NW_724, children }: { note: string; w?: string; children?: React.ReactNode }) {
+/** Muted, single-line truncated note. `w` overrides the 1700 max-width ladder.
+    `pad` adds an 8px mobile side gutter so it doesn't sit flush to the margins. */
+function Note({ note, w = NW_724, pad, children }: { note: string; w?: string; pad?: boolean; children?: React.ReactNode }) {
   return (
-    <p className={`${NOTE_BASE} ${NOTE_SIZE} ${NOTE_TRUNC} ${w} ${note}`}>
+    <p className={`${NOTE_BASE} ${NOTE_SIZE} ${NOTE_TRUNC} ${w} ${pad ? "px-2 min-[768px]:px-0" : ""} ${note}`}>
       {children ?? "Released 5 days ago: Hardhat 3 has moved out of beta and is now stable"}
     </p>
   );
@@ -66,7 +69,7 @@ export function ClassicRelease({ copy, note }: SlotTone) {
   return (
     <div className={`flex w-full flex-col items-center text-center ${GAP}`}>
       <Link size={LINK_16} tone={copy} />
-      <Note note={note} />
+      <Note note={note} pad />
     </div>
   );
 }
@@ -76,36 +79,42 @@ export function InlineNoteRelease({ note }: SlotTone) {
   return (
     <div className={`flex flex-col items-center text-center ${GAP} ${NOTE_BASE} ${NOTE_SIZE} ${note}`}>
       <p>
-        <a href="#" className="whitespace-nowrap underline decoration-from-font">Hardhat v3.7.0</a> Released 5 days ago
+        <a href="#" className={`whitespace-nowrap underline decoration-from-font ${UL}`}>Hardhat v3.7.0</a> Released 5 days ago
       </p>
       <p className="w-full min-w-0 truncate">Hardhat 3 has moved out of beta and is now stable</p>
     </div>
   );
 }
 
-/** 3 — Inverted kicker: tiny "Released 5 days ago" eyebrow, then link + note
-    together on one truncated row beneath it. */
-export function VioletLinkRelease({ copy, note }: SlotTone) {
+/** 2 — Violet link: identical to Classic but the link is violet
+    (#5E21FF light / #7A5EFF dark). */
+export function VioletLinkRelease({ note }: SlotTone) {
   return (
-    <div className={`flex flex-col items-center text-center ${GAP}`}>
-      <p className={`${NOTE_BASE} ${KICKER_SIZE} opacity-80 ${note}`}>Released 5 days ago</p>
-      <div className={`flex w-full items-center justify-center ${GAP}`}>
-        <Link size={LINK_13} tone={copy} />
-        <Note note={note} w={NW_508}>Hardhat 3 has moved out of beta and is now stable</Note>
-      </div>
+    <div className={`flex w-full flex-col items-center text-center ${GAP}`}>
+      <Link size={LINK_16} tone={VIOLET} />
+      <Note note={note} pad />
     </div>
   );
 }
 
-/** 4 — Label + row: violet link + muted description on one truncated row, tiny
-    "Released" kicker above. */
-export function LabelRelease({ note }: SlotTone) {
+/** 3 — Label + row (Figma 1700): tiny "Released 5 days ago" kicker (10px) over a
+    [violet link + muted note] row (13px). Link #7A5EFF both themes, underlined;
+    kicker #B0B2B5 / #6C6F74, note #6C6F74 / #B0B2B5. Kicker→row 4px, link↔note
+    16px, container px-40 — all scaled down per Op1's ladders. */
+export function LabelRelease({}: SlotTone) {
   return (
-    <div className={`flex flex-col items-center text-center ${GAP}`}>
-      <p className={`${NOTE_BASE} ${KICKER_SIZE} opacity-80 ${note}`}>Released 5 days ago</p>
-      <div className={`flex w-full items-center justify-center ${GAP}`}>
-        <Link size={LINK_13} dec="" tone={VIOLET} />
-        <Note note={note} w={NW_508}>Hardhat 3 has moved out of beta and is now stable</Note>
+    <div className="flex w-full flex-col items-center gap-0.5 px-2 min-[768px]:gap-1 min-[768px]:px-4 min-[1280px]:px-6 min-[1700px]:px-10">
+      <p className={`${NOTE_BASE} ${NOTE_SIZE} truncate text-center text-[#b0b2b5] dark:text-[#6c6f74]`}>
+        Released 5 days ago
+      </p>
+      {/* Op3 link↔note gap scales proportionally (10/12/12/16) so it stays
+          visible at the smaller breaks, unlike the shared GAP (4/4/8/16). */}
+      <div className="flex w-full min-w-0 items-center justify-center gap-[10px] min-[768px]:gap-[12px] min-[1700px]:gap-4">
+        {/* Link and note share NOTE_SIZE so they stay the same size at every break. */}
+        <Link size={NOTE_SIZE} tone={VIOLET} />
+        <Note note="text-[#6c6f74] dark:text-[#b0b2b5]" w="">
+          Hardhat 3 has moved out of beta and is now stable
+        </Note>
       </div>
     </div>
   );
