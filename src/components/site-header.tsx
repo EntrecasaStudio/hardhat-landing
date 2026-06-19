@@ -1,17 +1,31 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { asset } from "@/lib/asset";
 import { useTheme } from "./theme-provider";
 
 const NAV = ["documentation", "plugins", "hardhat 2"];
 
 export function SiteHeader() {
+  const scrolled = useScrolled();
   return (
     <header className="sticky top-0 z-50">
       <BannerTop />
-      <Nav />
+      <Nav scrolled={scrolled} />
     </header>
   );
+}
+
+// True once the page is scrolled past the top — used to fade the nav backdrop in.
+function useScrolled(threshold = 4) {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > threshold);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [threshold]);
+  return scrolled;
 }
 
 function BannerTop() {
@@ -27,13 +41,20 @@ function BannerTop() {
   );
 }
 
-function Nav() {
+function Nav({ scrolled }: { scrolled: boolean }) {
   return (
-    <div
-      className="h-[80px] backdrop-blur xl:h-[90px]"
-      style={{ background: "color-mix(in srgb, var(--bg) 85%, transparent)" }}
-    >
-      <div className="mx-auto flex h-full max-w-[1920px] items-center justify-between px-4 md:px-8">
+    <div className="relative h-[80px] xl:h-[90px]">
+      {/* Background plane + blur on its own layer: hidden at the very top so the
+          diamond illustration's tip shows through the nav, fading in (with the
+          backdrop blur) once the page scrolls underneath it. */}
+      <div
+        aria-hidden
+        className={`pointer-events-none absolute inset-0 backdrop-blur transition-opacity duration-300 ease-out motion-reduce:transition-none ${
+          scrolled ? "opacity-100" : "opacity-0"
+        }`}
+        style={{ background: "color-mix(in srgb, var(--bg) 85%, transparent)" }}
+      />
+      <div className="relative mx-auto flex h-full max-w-[1920px] items-center justify-between px-4 md:px-8">
         <a href="#" aria-label="Hardhat" className="flex items-center">
           <img src={asset("/hardhat-logotype.svg")} alt="Hardhat" className="h-[27.665px] w-auto select-none dark:hidden md:h-[35px]" draggable={false} />
           <img src={asset("/hardhat-logotype-dark.svg")} alt="Hardhat" className="hidden h-[27.665px] w-auto select-none dark:block md:h-[35px]" draggable={false} />

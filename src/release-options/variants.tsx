@@ -39,7 +39,6 @@ const NW_508 = "min-[768px]:max-w-[280px] min-[1280px]:max-w-[330px] min-[1700px
 // below the text and skip ink (break around glyph descenders).
 const UL = "underline-offset-[25%] [text-decoration-skip-ink:auto]";
 const DEC_UNDERLINE = `underline decoration-from-font ${UL}`;
-const DEC_DOTTED = `underline decoration-dotted decoration-violet-5 ${UL}`;
 // Accent violet link (exact Figma): #5E21FF light, #7A5EFF dark.
 const VIOLET = "text-[#5e21ff] dark:text-[#7a5eff]";
 
@@ -147,21 +146,25 @@ export function LightPillRelease({ copy, note }: SlotTone) {
   );
 }
 
-/** 7 — Inline row: neutral underlined link inline-first + truncated note, no chip. */
-export function InlineRowRelease({ copy, note }: SlotTone) {
+/** 7 — Inline row (no chip): bold underlined link — copy ink in light, yellow-6
+    (#edcf00) accent in dark — + truncated note, the pair centred as a group.
+    Link and note share NOTE_SIZE; from-font underline. */
+export function InlineRowRelease({ note }: SlotTone) {
   return (
-    <div className={`flex w-full items-center justify-center ${GAP}`}>
-      <Link size={LINK_13} tone={copy} />
+    <div className={`flex w-full items-center justify-center ${GAP_INLINE}`}>
+      <Link size={NOTE_SIZE} tone="text-[#181a1f] dark:text-[#edcf00]" />
       <Note note={note} />
     </div>
   );
 }
 
-/** 8 — Violet row: dotted violet link inline-first + truncated note, no chip. */
+/** 8 — Violet row: identical to Op7 but the link is violet (#5E21FF / #7A5EFF).
+    NB: Figma draws the light underline dotted and omits it in dark — kept solid
+    and consistent per the "idem a 7" brief (flagged to the user). */
 export function VioletRowRelease({ note }: SlotTone) {
   return (
-    <div className={`flex w-full items-center justify-center ${GAP}`}>
-      <Link size={LINK_13} dec={DEC_DOTTED} tone={VIOLET} />
+    <div className={`flex w-full items-center justify-center ${GAP_INLINE}`}>
+      <Link size={NOTE_SIZE} tone={VIOLET} />
       <Note note={note} />
     </div>
   );
