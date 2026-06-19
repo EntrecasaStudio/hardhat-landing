@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { Hero } from "./hero";
 import { RELEASE_OPTIONS, getOptionIndex } from "@/release-options/registry";
 
@@ -53,11 +53,75 @@ export function OptionPager() {
     return () => window.removeEventListener("keydown", onKey);
   }, [nav]);
 
+  // Centred "Op N / 8" toast that flashes for ~1.6s — shown after a touch swipe
+  // while the pager is collapsed, so the reviewer knows which variant they
+  // landed on (when expanded, the pill already shows the number).
+  const [toast, setToast] = useState(false);
+  const toastTimer = useRef<number | undefined>(undefined);
+  const flashToast = useCallback(() => {
+    setToast(true);
+    clearTimeout(toastTimer.current);
+    toastTimer.current = window.setTimeout(() => setToast(false), 1600);
+  }, []);
+
+  // Touch swipe (mobile/tablet, where there are no arrow keys): a committed
+  // horizontal drag over the hero flips to the prev/next option. `touch-action:
+  // pan-y pinch-zoom` keeps vertical scroll and zoom native, so we only see
+  // horizontal gestures; we ignore edge swipes (iOS back), near-vertical drags
+  // and taps. Left → next, right → prev.
+  const swipeStart = useRef<{ x: number; y: number } | null>(null);
+  const onPointerDown = (e: ReactPointerEvent) => {
+    if (e.pointerType !== "touch") return;
+    const edge = 24;
+    if (e.clientX < edge || e.clientX > window.innerWidth - edge) {
+      swipeStart.current = null;
+      return;
+    }
+    swipeStart.current = { x: e.clientX, y: e.clientY };
+  };
+  const onPointerUp = (e: ReactPointerEvent) => {
+    const s = swipeStart.current;
+    swipeStart.current = null;
+    if (!s || e.pointerType !== "touch") return;
+    const dx = e.clientX - s.x;
+    const dy = e.clientY - s.y;
+    if (Math.abs(dx) < 64 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    nav(idxRef.current + (dx < 0 ? 1 : -1));
+    if (!open) flashToast();
+  };
+  const onPointerCancel = () => {
+    swipeStart.current = null;
+  };
+
   const option = RELEASE_OPTIONS[index];
 
   return (
     <>
-      <Hero option={option} />
+      {/* Hero is also the touch-swipe surface (see onPointer* above). */}
+      <div
+        className="[touch-action:pan-y_pinch-zoom]"
+        onPointerDown={onPointerDown}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerCancel}
+      >
+        <Hero option={option} />
+      </div>
+
+      {/* Current-option toast: a brief centred confirmation after a touch swipe
+          while the pager is collapsed. Always present + aria-live so every option
+          change (swipe, arrows, pill) is announced to screen readers; the visual
+          fade only fires on swipe-while-collapsed. */}
+      <div
+        aria-live="polite"
+        aria-atomic="true"
+        className={`pointer-events-none fixed inset-x-0 top-1/2 z-50 flex -translate-y-1/2 justify-center px-4 transition-opacity duration-300 ease-out motion-reduce:transition-none ${
+          toast ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <span className="rounded-full bg-[#16181d]/95 px-4 py-2 font-mono text-sm tabular-nums tracking-[0.05em] text-white shadow-lg ring-1 ring-white/10 backdrop-blur">
+          Op {index + 1} / {COUNT}
+        </span>
+      </div>
 
       {/* Review pager: a centred pill that collapses to a half-circle tab docked
           at the right edge. CSS-only crossfade (transform/opacity, 250ms). */}
@@ -72,7 +136,7 @@ export function OptionPager() {
           <PagerButton label={`Previous option (${option.label})`} onClick={() => nav(idxRef.current - 1)} disabled={!open}>
             ‹
           </PagerButton>
-          <span className="whitespace-nowrap px-1 text-center tabular-nums tracking-[0.05em]" aria-live="polite">
+          <span className="whitespace-nowrap px-1 text-center tabular-nums tracking-[0.05em]">
             Op {index + 1} / {COUNT}
           </span>
           <PagerButton label={`Next option (${option.label})`} onClick={() => nav(idxRef.current + 1)} disabled={!open}>
