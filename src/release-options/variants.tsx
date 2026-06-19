@@ -21,8 +21,11 @@ const LINK_13 = "text-[10px] min-[768px]:text-[12px] min-[1280px]:text-[13px] mi
 const LINK_16 = "text-[10px] min-[768px]:text-[12px] min-[1280px]:text-[13px] min-[1700px]:text-[16px]";
 // Note / kicker font-size ladders.
 const NOTE_SIZE = "text-[8px] min-[768px]:text-[10px] min-[1280px]:text-[10px] min-[1700px]:text-[13px]";
-// Inter-element gap ladder (4/4/8/16).
+// Inter-element gap ladder (4/4/8/16) — for stacked layouts.
 const GAP = "gap-1 min-[1280px]:gap-2 min-[1700px]:gap-4";
+// Inline link↔note gap (10/12/12/16) — scales proportionally so it stays visible
+// at the small breaks instead of collapsing to 4px when both sit on one line.
+const GAP_INLINE = "gap-[10px] min-[768px]:gap-[12px] min-[1700px]:gap-4";
 
 // Single-line behaviour: the note shrinks to its content (capped at max-width)
 // so the parent's items-center/justify-center keeps it centred; text-left only
@@ -43,7 +46,7 @@ const VIOLET = "text-[#5e21ff] dark:text-[#7a5eff]";
 // Chip (pill) — theme-correct: violet-1 tint in light, #20232a in dark (NOT
 // violet). Padding/radius scaled per break (px-8 py-4 rounded-32 @1700).
 const CHIP =
-  "rounded-[16px] bg-violet-1 px-3 py-1.5 dark:bg-[#20232a] min-[768px]:rounded-[20px] min-[768px]:px-4 min-[768px]:py-2 min-[1280px]:px-6 min-[1280px]:py-3 min-[1700px]:rounded-[32px] min-[1700px]:px-8 min-[1700px]:py-4";
+  "max-w-full rounded-[16px] bg-violet-1 px-3 py-1.5 dark:bg-[#20232a] md:max-w-none min-[768px]:rounded-[20px] min-[768px]:px-4 min-[768px]:py-2 min-[1280px]:px-6 min-[1280px]:py-3 min-[1700px]:rounded-[32px] min-[1700px]:px-8 min-[1700px]:py-4";
 
 /** Release link "Hardhat v3.7.0". */
 function Link({ size = LINK_13, dec = DEC_UNDERLINE, tone }: { size?: string; dec?: string; tone: string }) {
@@ -74,12 +77,14 @@ export function ClassicRelease({ copy, note }: SlotTone) {
   );
 }
 
-/** 2 — Inline note: link + "Released 5 days ago" muted on line 1, rest below. */
+/** 4 — Inline note (Figma 1700): bold underlined link + "Released 5 days ago"
+    (regular) inline on line 1, then the description (regular) truncated below.
+    Everything the note tone, 13px, leading 1.5. gap 8px, px-40 — scaled per break. */
 export function InlineNoteRelease({ note }: SlotTone) {
   return (
-    <div className={`flex flex-col items-center text-center ${GAP} ${NOTE_BASE} ${NOTE_SIZE} ${note}`}>
-      <p>
-        <a href="#" className={`whitespace-nowrap underline decoration-from-font ${UL}`}>Hardhat v3.7.0</a> Released 5 days ago
+    <div className={`flex w-full flex-col items-center text-center font-mono font-normal leading-[1.5] tracking-[0.05em] ${NOTE_SIZE} gap-[5px] px-2 min-[768px]:gap-[6px] min-[768px]:px-4 min-[1280px]:px-6 min-[1700px]:gap-2 min-[1700px]:px-10 ${note}`}>
+      <p className="whitespace-nowrap">
+        <a href="#" className={`font-bold underline decoration-from-font ${UL}`}>Hardhat v3.7.0</a> Released 5 days ago
       </p>
       <p className="w-full min-w-0 truncate">Hardhat 3 has moved out of beta and is now stable</p>
     </div>
@@ -109,7 +114,7 @@ export function LabelRelease({}: SlotTone) {
       </p>
       {/* Op3 link↔note gap scales proportionally (10/12/12/16) so it stays
           visible at the smaller breaks, unlike the shared GAP (4/4/8/16). */}
-      <div className="flex w-full min-w-0 items-center justify-center gap-[10px] min-[768px]:gap-[12px] min-[1700px]:gap-4">
+      <div className={`flex w-full min-w-0 items-center justify-center ${GAP_INLINE}`}>
         {/* Link and note share NOTE_SIZE so they stay the same size at every break. */}
         <Link size={NOTE_SIZE} tone={VIOLET} />
         <Note note="text-[#6c6f74] dark:text-[#b0b2b5]" w="">
@@ -124,8 +129,8 @@ export function LabelRelease({}: SlotTone) {
     truncated note. Figma 1700: note width 508. Single line. */
 export function VioletPillRelease({ note }: SlotTone) {
   return (
-    <div className={`flex items-center justify-center ${GAP} ${CHIP}`}>
-      <Link size={LINK_13} dec={DEC_DOTTED} tone={VIOLET} />
+    <div className={`flex items-center justify-center ${GAP_INLINE} ${CHIP}`}>
+      <Link size={NOTE_SIZE} dec={DEC_UNDERLINE} tone={VIOLET} />
       <Note note={note} w={NW_508} />
     </div>
   );
